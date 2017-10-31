@@ -5,13 +5,14 @@ import requests
 
 
 class Pysensu():
-    def __init__(self, host, user=None, password=None, port=4567, ssl=False):
+    def __init__(self, host, user=None, password=None, port=4567, ssl=False, timeout=None):
         self.host = host
         self.user = user
         self.password = password
         self.port = port
         self.ssl = ssl
         self.api_url = self._build_api_url(host, user, password, port, ssl)
+        self.timeout = timeout
 
     def _build_api_url(self, host, user, password, port, ssl):
         if ssl == True:
@@ -28,13 +29,13 @@ class Pysensu():
 
     def _api_call(self, url, method, data=None):
         if method == "post":
-            return requests.post(url, data=data)
+            return requests.post(url, data=data, timeout=self.timeout)
         elif method == "get":
-            return requests.get(url, data=data)
+            return requests.get(url, data=data, timeout=self.timeout)
         elif method == "put":
-            return requests.put(url, data=data)
+            return requests.put(url, data=data, timeout=self.timeout)
         elif method == "delete":
-            return requests.delete(url, data=data)
+            return requests.delete(url, data=data, timeout=self.timeout)
         else:
             raise ValueError("Invalid method")
 
