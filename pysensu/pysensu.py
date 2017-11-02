@@ -11,6 +11,13 @@ class Pysensu():
         self.password = password
         self.port = port
         self.ssl = ssl
+
+        self.session = requests.Session()
+
+        if (user and not password) or (password and not user):
+            raise ValueError("Must specify both user and password, or neither")
+
+        self.session.auth = (user, password)
         self.api_url = self._build_api_url(host, user, password, port, ssl)
         self.timeout = timeout
 
@@ -19,23 +26,17 @@ class Pysensu():
             protocol = 'https'
         else:
             protocol = 'http'
-        if user and password:
-            credentials = "{}:{}@".format(user, password)
-        elif (user and not password) or (password and not user):
-            raise ValueError("Must specify both user and password, or neither")
-        else:
-            credentials = ""
-        return "{}://{}{}:{}".format(protocol, credentials, host, port)
+        return "{}://{}:{}".format(protocol, host, port)
 
     def _api_call(self, url, method, data=None):
         if method == "post":
-            return requests.post(url, data=data, timeout=self.timeout)
+            return self.session.post(url, data=data, timeout=self.timeout)
         elif method == "get":
-            return requests.get(url, data=data, timeout=self.timeout)
+            return self.session.get(url, data=data, timeout=self.timeout)
         elif method == "put":
-            return requests.put(url, data=data, timeout=self.timeout)
+            return self.session.put(url, data=data, timeout=self.timeout)
         elif method == "delete":
-            return requests.delete(url, data=data, timeout=self.timeout)
+            return self.session.delete(url, data=data, timeout=self.timeout)
         else:
             raise ValueError("Invalid method")
 
